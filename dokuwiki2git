@@ -86,8 +86,13 @@ class Converter:
 				if len(dirname) > 0:
 					cmds.append('mkdir -p "%s"' % dirname)
 				cmds.append('gunzip -c "%s" > "%s"' % (filename, pagefile))
-				cmds.append('git add "%s"' % pagefile)
+				newpagefile = pagefile.replace('.txt', '.md')
+				cmds.append('mv "%s" "%s"' % (pagefile, newpagefile))
+				cmds.append('php /Users/michael/_fun/_proj/19-diary-convert/doku2md/convert.php "%s"' % newpagefile)
+				cmds.append("sed -i '' '/^\s*$/d' '%s'" % newpagefile)
+				cmds.append('git add "%s"' % newpagefile)
 			elif c[2] == 'D': # delete
+				pagefile = pagefile.replace('.txt', '.md')
 				cmds.append('git rm --quiet "%s"' % pagefile)
 			cmds.append('git commit --quiet --allow-empty --allow-empty-message --author="%s" --date="%s +0000" -m "%s"' % (author, timestamp, message.replace('"', '\\"')))
 			self.commands.extend(cmds)
